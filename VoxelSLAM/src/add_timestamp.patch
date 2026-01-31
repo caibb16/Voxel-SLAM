@@ -1,0 +1,32 @@
+--- voxelslam.cpp.bak 2026-01-30 00:00:00.000000000 +0800
++++ voxelslam.cpp2026-01-30 00:00:00.000000000 +0800
+@@ -1,4 +1,7 @@
+ #include "voxelslam.hpp"
++#include <iomanip>
++#include <sstream>
++#include <ctime>
+ 
+ using namespace std;
+ 
+@@ -769,7 +772,20 @@
+     
+     string lid_topic, imu_topic;
+     n.param<string>("General/lid_topic", lid_topic, "/livox/lidar");
+     n.param<string>("General/imu_topic", imu_topic, "/livox/imu");
+     n.param<string>("General/bagname", bagname, "site3_handheld_4");
++    
++    // 自动在 bagname 后添加时间戳
++    time_t now = time(nullptr);
++    struct tm* tm_now = localtime(&now);
++    stringstream ss_time;
++    ss_time << "_" << (tm_now->tm_year + 1900)
++            << setfill('0') << setw(2) << (tm_now->tm_mon + 1)
++            << setfill('0') << setw(2) << tm_now->tm_mday
++            << "_" << setfill('0') << setw(2) << tm_now->tm_hour
++            << setfill('0') << setw(2) << tm_now->tm_min
++            << setfill('0') << setw(2) << tm_now->tm_sec;
++    bagname += ss_time.str();
++    
+     n.param<string>("General/save_path", savepath, "");
+     n.param<int>("General/lidar_type", feat.lidar_type, 0);
+     n.param<double>("General/blind", feat.blind, 0.1);
